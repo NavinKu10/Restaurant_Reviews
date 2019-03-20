@@ -8,19 +8,21 @@ import pandas as pd
 # Importing the dataset
 dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
 
+#downloading stopwords list
+from sklearn.feature_extraction import stop_words
+#stop_words.ENGLISH_STOP_WORDS   #shows the stopwrods list
+
 # Cleaning the texts
 import re
 import nltk
-nltk.download('stopwords')
-from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
+nltk.download('wordnet')
 corpus = []
 for i in range(0, 1000):
     review = re.sub('[^a-zA-Z]', ' ', dataset['Review'][i])
     review = review.lower()
     review = review.split()
-    ps = PorterStemmer()
-    review = [ps.stem(word) for word in review if not word in set(stopwords.words('english'))]
+    lemma = nltk.wordnet.WordNetLemmatizer()
+    review = [lemma.lemmatize(word) for word in review if not word in set(stop_words.ENGLISH_STOP_WORDS)]
     review = ' '.join(review)
     corpus.append(review)
 
@@ -32,7 +34,7 @@ y = dataset.iloc[:, 1].values
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.cross_validation import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.05, random_state = 0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.10, random_state = 1)
 
 # Fitting Naive Bayes to the Training set
 from sklearn.naive_bayes import GaussianNB
